@@ -7,7 +7,7 @@
 
 use 5.006;
 use strict;
-use warnings;
+## no critic (TestingAndDebugging::RequireUseWarnings) use warnings;
 
 package Parse::RecDescent;
 
@@ -105,7 +105,7 @@ sub Precompile
 
 use 5.006;
 use strict;
-use warnings;
+## no critic (TestingAndDebugging::RequireUseWarnings) use warnings;
 
 };
 
@@ -524,7 +524,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
     my $_noactions = $_[3];
     my @arg =    defined $_[4] ? @{ &{$_[4]} } : ();
     my $_itempos = $_[5];
-    my %arg =    ($#arg & 01) ? @arg : (@arg, undef);
+    my %arg =    ($#arg & 1) ? @arg : (@arg, undef);
     my $text;
     my $lastsep;
     my $current_match;
