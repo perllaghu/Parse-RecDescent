@@ -482,7 +482,7 @@ sub code
 {
     my ($self, $namespace, $parser, $check) = @_;
 
-eval 'undef &' . $namespace . '::' . $self->{"name"} unless $parser->{saving};
+eval { 'undef &' . $namespace . '::' . $self->{"name"} } unless $parser->{saving};
 
     my $code =
 '
@@ -1263,9 +1263,11 @@ sub new ($$$$$$)
     $desc =~ s/}/\\}/g;
     $desc =~ s/{/\\{/g;
 
-    if (!eval "no strict;
+    if (!eval {
+        "no strict;
            local \$SIG{__WARN__} = sub {0};
-           '' =~ m$ldel$pattern$rdel$mod" and $@)
+           '' =~ m$ldel$pattern$rdel$mod"}
+            and $@)
     {
         Parse::RecDescent::_warn(3, "Token pattern \"m$ldel$pattern$rdel$mod\"
                          may not be a valid regular expression",
@@ -1955,7 +1957,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 my $ERRORS = 0;
 
 our $VERSION = '1.967015';
-$VERSION = eval $VERSION;
+$VERSION = eval {$VERSION};
 $_FILENAME=__FILE__;
 
 # BUILDING A PARSER
@@ -2490,7 +2492,7 @@ sub _generate
                 _parse("a token constructor", $aftererror,$line,$code);
                 $code =~ s/\A\s*<token:(.*)>\Z/$1/s;
 
-                my $types = eval 'no strict; local $SIG{__WARN__} = sub {0}; my @arr=('.$code.'); @arr' || ();
+                my $types = eval {'no strict; local $SIG{__WARN__} = sub {0}; my @arr=('.$code.'); @arr'} || ();
                 if (!$types)
                 {
                     _error("Incorrect token specification: \"$@\"", $line);
@@ -2965,7 +2967,8 @@ sub _generate
             and close $trace_file;
         }
 
-        unless ( eval "$code 1" )
+
+        unless ( eval "$code 1" ) ## no critic (BuiltinFunctions::ProhibitStringyEval)
         {
             _error("Internal error in generated parser code!");
             $@ =~ s/at grammar/in grammar at/;
@@ -3046,7 +3049,7 @@ sub _check_grammar ($)
                            misspell \"$call\"? Otherwise
                            it will be treated as an
                            immediate <reject>.");
-                    eval "sub $self->{namespace}::$call {undef}";
+                    eval "sub $self->{namespace}::$call {undef}";  ## no critic (BuiltinFunctions::ProhibitStringyEval)
                 }
                 else    # EXPERIMENTAL
                 {
