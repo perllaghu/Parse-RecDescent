@@ -1,7 +1,10 @@
 # GENERATE RECURSIVE DESCENT PARSER OBJECTS FROM A GRAMMAR
 
-## no critic (Subroutines::ProhibitSubroutinePrototypes Subroutines::RequireArgUnpacking)
+## no critic (Subroutines::ProhibitSubroutinePrototypes Subroutines::RequireFinalReturn)
+## no critic (ValuesAndExpressions::ProhibitMixedBooleanOperators Subroutines::RequireArgUnpacking)
 ## no critic (Modules::ProhibitMultiplePackages Modules::RequireExplicitPackage)
+## no critic (TestingAndDebugging::ProhibitNoStrict TestingAndDebugging::ProhibitProlongedStrictureOverride)
+
 use 5.006;
 use strict;
 use warnings;
@@ -97,6 +100,8 @@ sub Precompile
 #
 
 ## no critic (Modules::ProhibitMultiplePackages Modules::RequireExplicitPackage)
+## no critic (ValuesAndExpressions::ProhibitMixedBooleanOperators Subroutines::RequireArgUnpacking)
+## no critic (TestingAndDebugging::ProhibitNoStrict TestingAndDebugging::ProhibitProlongedStrictureOverride)
 
 use 5.006;
 use strict;
