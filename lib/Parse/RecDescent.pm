@@ -343,7 +343,7 @@ sub new ($$$$$)
         my $self = $owner->{"rules"}{$name};
         if ($replace && !$self->{"changed"})
         {
-            $self->reset;
+            $self->Reset;
         }
         return $self;
     }
@@ -364,7 +364,7 @@ sub new ($$$$$)
     }
 }
 
-sub reset($)
+sub Reset($)
 {
     @{$_[0]->{"prods"}} = ();
     @{$_[0]->{"calls"}} = ();
