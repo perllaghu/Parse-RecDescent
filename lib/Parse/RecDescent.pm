@@ -247,7 +247,7 @@ sub STORE
 {
     my $parser = $_[0]->{parser};
     $parser->{offsetlinenum} -= $parser->{lastlinenum} - $_[1];
-    return undef;
+    return;
 }
 
 sub resync   # ($linecounter)
@@ -566,7 +566,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
                      q{' . $self->{"name"} .'},
                      $tracelevel)
                     if defined $::RD_TRACE;
-        return undef;
+        return;
     }
     if (!defined($return) && defined($score))
     {
@@ -2200,7 +2200,7 @@ sub _generate
             _parse("an implicit subrule", $aftererror, $line,
                 "( $code )");
             my $implicit = $rule->nextimplicit;
-            return undef
+            return
                 if !$self->_generate("$implicit : $code",$replace,1);
             my $pos = pos $grammar;
             substr($grammar,$pos,0,$implicit);
@@ -3275,7 +3275,7 @@ sub _parserepeat($$$$$$$$$)    # RETURNS A REF TO AN ARRAY OF MATCHES
         last if ++$reps >= $min and $prevtextlen == length $text;
     }
 
-    do { $expectation->failed(); return undef} if $reps<$min;
+    do { $expectation->failed(); return} if $reps<$min;
 
     if (defined $itemposfirst)
     {
