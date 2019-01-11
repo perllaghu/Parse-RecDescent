@@ -8,8 +8,6 @@ use warnings;
 
 package Parse::RecDescent;
 
-
-
 use Text::Balanced qw ( extract_codeblock extract_bracketed extract_quotelike extract_delimited );
 
 use vars qw ( $skip );
@@ -114,7 +112,7 @@ sub Precompile
         # Do not allow &DESTROY to remove the precompiled namespace
         delete $self->{_not_precompiled};
 
-        foreach ( keys %{$self->{rules}} ) {
+        for ( keys %{$self->{rules}} ) {
             $self->{rules}{$_}{changed} = 1;
         }
 
@@ -371,8 +369,7 @@ sub hasleftmost($$)
 {
     my ($self, $ref) = @_;
 
-    my $prod;
-    foreach $prod ( @{$self->{"prods"}} )
+    for my $prod ( @{$self->{"prods"}} )
     {
         return 1 if $prod->hasleftmost($ref);
     }
@@ -385,8 +382,7 @@ sub leftmostsubrules($)
     my $self = shift;
     my @subrules = ();
 
-    my $prod;
-    foreach $prod ( @{$self->{"prods"}} )
+    for my $prod ( @{$self->{"prods"}} )
     {
         push @subrules, $prod->leftmostsubrule();
     }
@@ -399,8 +395,7 @@ sub expected($)
     my $self = shift;
     my @expected = ();
 
-    my $prod;
-    foreach $prod ( @{$self->{"prods"}} )
+    for my $prod ( @{$self->{"prods"}} )
     {
         my $next = $prod->expected();
         unless (! $next or _contains($next,@expected) )
@@ -415,8 +410,7 @@ sub expected($)
 sub _contains($@)
 {
     my $target = shift;
-    my $item;
-    foreach $item ( @_ ) { return 1 if $target eq $item; }
+    for my $item ( @_ ) { return 1 if $target eq $item; }
     return 0;
 }
 
@@ -547,8 +541,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
     '. $self->{vars} .'
 ';
 
-    my $prod;
-    foreach $prod ( @{$self->{"prods"}} )
+    for my $prod ( @{$self->{"prods"}} )
     {
         $prod->addscore($self->{autoscore},0,0) if $self->{autoscore};
         next unless $prod->checkleftmost();
@@ -614,13 +607,11 @@ sub isleftrec($$)
     my ($self, $rules) = @_;
     my $root = $self->{"name"};
     @left = $self->leftmostsubrules();
-    my $next;
-    foreach $next ( @left )
+    for my $next ( @left )
     {
         next unless defined $rules->{$next}; # SKIP NON-EXISTENT RULES
         return 1 if $next eq $root;
-        my $child;
-        foreach $child ( $rules->{$next}->leftmostsubrules() )
+        for my $child ( $rules->{$next}->leftmostsubrules() )
         {
             push(@left, $child)
             if ! _contains($child, @left) ;
@@ -737,8 +728,7 @@ sub checkleftmost($)
 
 sub changesskip($)
 {
-    my $item;
-    foreach $item (@{$_[0]->{"items"}})
+    for my $item (@{$_[0]->{"items"}})
     {
         if (ref($item) =~ /Parse::RecDescent::(Action|Directive)/)
         {
@@ -856,7 +846,7 @@ sub _duplicate_itempos
     my ($src) = @_;
     my $dst = {};
 
-    foreach (keys %$src)
+    for (keys %$src)
     {
         %{$dst->{$_}} = %{$src->{$_}};
     }
@@ -871,7 +861,7 @@ sub _update_itempos
       @$typekeys :
       keys %$src;
 
-    foreach my $k (keys %$src)
+    for my $k (keys %$src)
     {
         if ('ARRAY' eq ref $poskeys)
         {
@@ -3029,15 +3019,13 @@ sub _check_grammar ($)
 {
     my $self = shift;
     my $rules = $self->{"rules"};
-    my $rule;
-    foreach $rule ( values %$rules )
+    for my $rule ( values %$rules )
     {
         next if ! $rule->{"changed"};
 
     # CHECK FOR UNDEFINED RULES
 
-        my $call;
-        foreach $call ( @{$rule->{"calls"}} )
+        for my $call ( @{$rule->{"calls"}} )
         {
             if (!defined ${$rules}{$call}
               &&!defined &{"Parse::RecDescent::$call"})
@@ -3090,8 +3078,7 @@ sub _check_grammar ($)
     # CHECK FOR PRODUCTIONS FOLLOWING EMPTY PRODUCTIONS
       {
           my $hasempty;
-          my $prod;
-          foreach $prod ( @{$rule->{"prods"}} ) {
+          for my $prod ( @{$rule->{"prods"}} ) {
               if ($hasempty) {
                   _error("Production " . $prod->describe . " for \"$rule->{name}\"
                          will never be reached (preceding empty production will
@@ -3145,9 +3132,8 @@ local \$SIG{__WARN__} = sub {0};
     $code .= "push \@$self->{namespace}\::ISA, 'Parse::RecDescent';";
     $self->{"startcode"} = '';
 
-    my $rule;
     # sort the rules to ensure the output is reproducible
-    foreach $rule ( sort { $a->{name} cmp $b->{name} }
+    for my $rule ( sort { $a->{name} cmp $b->{name} }
                     values %{$self->{"rules"}} )
     {
         if ($rule->{"changed"})
@@ -3251,11 +3237,11 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
 
     if (defined $retval)
     {
-        foreach ( @{$_[0]->{deferred}} ) { &$_; }
+        for ( @{$_[0]->{deferred}} ) { &$_; }
     }
     else
     {
-        foreach ( @{$_[0]->{errors}} ) { _error(@$_); }
+        for ( @{$_[0]->{errors}} ) { _error(@$_); }
     }
 
     if (ref $_[1] eq 'SCALAR') { ${$_[1]} = $text }
