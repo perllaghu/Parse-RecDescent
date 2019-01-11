@@ -591,7 +591,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
         $return = $score_return;
     }
     splice @{$thisparser->{errors}}, $err_at;
-    $return = $item[$#item] unless defined $return;
+    $return = $item[-1] unless defined $return;
     if (defined $::RD_TRACE)
     {
         Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' rule<< (return value: [} .
@@ -899,9 +899,9 @@ sub incitempos
 {
     return q
     {
-        $itempos[$#itempos]{'offset'}{'from'} += length($lastsep);
-        $itempos[$#itempos]{'line'}{'from'}   = $thisline;
-        $itempos[$#itempos]{'column'}{'from'} = $thiscolumn;
+        $itempos[-1]{'offset'}{'from'} += length($lastsep);
+        $itempos[-1]{'line'}{'from'}   = $thisline;
+        $itempos[-1]{'column'}{'from'} = $thiscolumn;
     }
 }
 
@@ -909,11 +909,11 @@ sub unincitempos
 {
     # the next incitempos will properly set these two fields, but
     # {'offset'}{'from'} needs to be decreased by length($lastsep)
-    # $itempos[$#itempos]{'line'}{'from'}
-    # $itempos[$#itempos]{'column'}{'from'}
+    # $itempos[-1]{'line'}{'from'}
+    # $itempos[-1]{'column'}{'from'}
     return q
     {
-        $itempos[$#itempos]{'offset'}{'from'} -= length($lastsep) if defined $lastsep;
+        $itempos[-1]{'offset'}{'from'} -= length($lastsep) if defined $lastsep;
     }
 }
 
@@ -921,9 +921,9 @@ sub postitempos
 {
     return q
     {
-        $itempos[$#itempos]{'offset'}{'to'} = $prevoffset;
-        $itempos[$#itempos]{'line'}{'to'}   = $prevline;
-        $itempos[$#itempos]{'column'}{'to'} = $prevcolumn;
+        $itempos[-1]{'offset'}{'to'} = $prevoffset;
+        $itempos[-1]{'line'}{'to'}   = $prevline;
+        $itempos[-1]{'column'}{'to'} = $prevcolumn;
     }
 }
 
@@ -1557,7 +1557,7 @@ sub code($$$$)
         . ($self->{"lookahead"}?'1':'$_noactions')
         . ($self->{argcode} ? ",sub { return $self->{argcode} }"
                    : ',sub { \\@arg }')
-        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
+        . ($check->{"itempos"}?',$itempos[-1]':',undef')
         . ')))
         {
             '.($self->{"lookahead"} ? '$text = $_savetext;' : '').'
@@ -1674,7 +1674,7 @@ sub code($$$$)
         . ',$expectation,'
         . ($self->{argcode} ? "sub { return $self->{argcode} }"
                         : 'sub { \\@arg }')
-        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
+        . ($check->{"itempos"}?',$itempos[-1]':',undef')
         . ')))
         {
             Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' repeated subrule: ['
@@ -3303,7 +3303,7 @@ sub _parserepeat($$$$$$$$$)    # RETURNS A REF TO AN ARRAY OF MATCHES
     return [@tokens];
 }
 
-sub set_autoflush {
+sub set_autoflush { ## no critic (InputOutput::ProhibitOneArgSelect)
     my $orig_selected = select $_[0];
     $| = 1;
     select $orig_selected;
