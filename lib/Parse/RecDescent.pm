@@ -1,9 +1,14 @@
 # GENERATE RECURSIVE DESCENT PARSER OBJECTS FROM A GRAMMAR
 
+## no critic (Subroutines::ProhibitSubroutinePrototypes Subroutines::RequireArgUnpacking)
+## no critic (Modules::ProhibitMultiplePackages Modules::RequireExplicitPackage)
 use 5.006;
 use strict;
+use warnings;
 
 package Parse::RecDescent;
+
+
 
 use Text::Balanced qw ( extract_codeblock extract_bracketed extract_quotelike extract_delimited );
 
