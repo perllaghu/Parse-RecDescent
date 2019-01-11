@@ -90,10 +90,19 @@ sub Precompile
     open my $precompile_out, ">", $modulefile
       or croak("Can't write to new module file '$modulefile'");
 
-    print $precompile_out "#\n",
-      "# This parser was generated with\n",
-      "# Parse::RecDescent version $Parse::RecDescent::VERSION\n",
-      "#\n\n";
+    print $precompile_out qq{
+#
+# This parser was generated with
+# Parse::RecDescent version $Parse::RecDescent::VERSION
+#
+
+## no critic (Modules::ProhibitMultiplePackages Modules::RequireExplicitPackage)
+
+use 5.006;
+use strict;
+use warnings;
+
+};
 
     print STDERR "precompiling grammar from file '$sourcefile'\n",
       "to class $class in module file '$modulefile'\n"
