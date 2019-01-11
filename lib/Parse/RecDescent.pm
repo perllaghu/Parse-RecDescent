@@ -32,12 +32,11 @@ sub import  # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
 
         my ($sourcefile, $class, $runtime_class) = @ARGV;
 
-        local *IN;
-        open IN, $sourcefile
+        open my $import_in, '<', $sourcefile
             or _die(qq{Can't open grammar file "$sourcefile"});
         local $/; #
-        my $grammar = <IN>;
-        close IN;
+        my $grammar = <$import_in>;
+        close $import_in;
 
         Parse::RecDescent->Precompile({ -runtime_class => $runtime_class },
                                       $grammar, $class, $sourcefile);
@@ -88,11 +87,10 @@ sub Precompile
 
     my $code = '';
 
-    local *OUT;
-    open OUT, ">", $modulefile
+    open my $precompile_out, ">", $modulefile
       or croak("Can't write to new module file '$modulefile'");
 
-    print OUT "#\n",
+    print $precompile_out "#\n",
       "# This parser was generated with\n",
       "# Parse::RecDescent version $Parse::RecDescent::VERSION\n",
       "#\n\n";
@@ -156,12 +154,11 @@ EOWARNING
     # the contents of Parse::RecDescent as -runtime_class in the
     # resulting precompiled parser.
     if ($opt{-standalone}) {
-        local *IN;
-        open IN, '<', $Parse::RecDescent::_FILENAME
+        open my $precompile_in, '<', $Parse::RecDescent::_FILENAME
           or croak("Can't open $Parse::RecDescent::_FILENAME for standalone pre-compilation: $!\n");
         my $exclude = 0;
-        print OUT "{\n";
-        while (<IN>) {
+        print $precompile_out "{\n";
+        while (<$precompile_in>) {
             if ($_ =~ /^\s*#\s*ifndef\s+RUNTIME\s*$/) {
                 ++$exclude;
             }
@@ -181,38 +178,38 @@ EOWARNING
                 # Trick the indexer by including a newline in the package declarations
                 s/^package /package # this should not be indexed by CPAN\n/gs;
                 s/Parse::RecDescent/$opt{-runtime_class}/gs;
-                print OUT $_;
+                print $precompile_out $_;
             }
         }
-        close IN;
-        print OUT "}\n";
+        close $precompile_in;
+        print $precompile_out "}\n";
     }
 
     if ($grammar) {
-        print OUT "package $class;\n";
+        print $precompile_out "package $class;\n";
     }
 
     if (not $opt{-standalone}) {
-        print OUT "use $opt{-runtime_class};\n";
+        print $precompile_out "use $opt{-runtime_class};\n";
     }
 
     if ($grammar) {
-        print OUT "{ my \$ERRORS;\n\n";
+        print $precompile_out "{ my \$ERRORS;\n\n";
 
-        print OUT $code;
+        print $precompile_out $code;
 
-        print OUT "}\npackage $class; sub new { ";
-        print OUT "my ";
+        print $precompile_out "}\npackage $class; sub new { ";
+        print $precompile_out "my ";
 
         $code = $self->_dump([$self], [qw(self)]);
         $code =~ s/Parse::RecDescent/$opt{-runtime_class}/gs;
 
-        print OUT $code;
+        print $precompile_out $code;
 
-        print OUT "}";
+        print $precompile_out "}";
     }
 
-    close OUT
+    close $precompile_out
       or croak("Can't write to new module file '$modulefile'");
 }
 #endif
@@ -2953,10 +2950,10 @@ sub _generate
         {
             my $mode = ($nextnamespace eq "namespace000002") ? '>' : '>>';
             print STDERR "printing code (", length($code),") to RD_TRACE\n";
-            local *TRACE_FILE;
-            open TRACE_FILE, $mode, "RD_TRACE"
-            and print TRACE_FILE "my \$ERRORS;\n$code"
-            and close TRACE_FILE;
+            my $trace_file;
+            open $trace_file, $mode, "RD_TRACE"
+            and print $trace_file "my \$ERRORS;\n$code"
+            and close $trace_file;
         }
 
         unless ( eval "$code 1" )
